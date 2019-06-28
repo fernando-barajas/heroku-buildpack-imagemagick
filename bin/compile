@@ -11,7 +11,7 @@ CACHE_DIR=$2
 CACHE_ENABLED=true
 VENDOR_DIR="$BUILD_DIR/vendor"
 INSTALL_DIR="$VENDOR_DIR/imagemagick"
-IMAGE_MAGICK_VERSION="${IMAGE_MAGICK_VERSION:-6.9.10-49}"
+IMAGE_MAGICK_VERSION="${IMAGE_MAGICK_VERSION:-7.0.5-10}"
 CACHE_FILE="$CACHE_DIR/imagemagick-$IMAGE_MAGICK_VERSION.tar.gz"
 
 if [ ! -f $CACHE_FILE ] || [ $CACHE_ENABLED != 'true' ]; then
@@ -35,7 +35,15 @@ if [ ! -f $CACHE_FILE ] || [ $CACHE_ENABLED != 'true' ]; then
   cd $IMAGE_MAGICK_DIR
   export CPPFLAGS="-I$INSTALL_DIR/include"
   export LDFLAGS="-L$INSTALL_DIR/lib"
-  ./configure --prefix=$INSTALL_DIR --without-gvc --with-heic
+  ./configure --prefix=$INSTALL_DIR --with-autotrace=no  --with-gslib=yes  --with-fontpath=  \
+  --enable-delegate-build=yes  --enable-shared  --enable-static   --with-modules=yes \
+  --without-perl --without-magick-plus-plus --disable-openmp \
+  --with-bzlib=yes \
+  --with-jpeg=yes \
+  --with-png=yes \
+  --with-tiff=yes \
+  --with-xml=yes \
+  --with-rsvg=yes
   make && make install
   cd ..
   rm -rf $IMAGE_MAGICK_DIR
@@ -73,8 +81,8 @@ EOF
 echo "-----> Writing config file"
 cat > $INSTALL_DIR/magic.xml <<EOF
 <magicmap>
- <magic name="JPEG" offset="0" target="\377\330\377"/> 
- <magic name="PNG" offset="0" target="\211PNG\r\n\032\n"/> 
+ <magic name="JPEG" offset="0" target="\377\330\377"/>
+ <magic name="PNG" offset="0" target="\211PNG\r\n\032\n"/>
 </magicmap>
 EOF
 
